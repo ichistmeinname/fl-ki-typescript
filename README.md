@@ -4,12 +4,6 @@ This is a toy project on top of the
 [nahsh-hafas-package](https://www.npmjs.com/package/nahsh-hafas) in
 order to learn typescript.
 The main functionality is to check if the route between Kiel and
-Flensburg (and vice versa) has any delays or other disturbances.
-**Client for the
-[Nahverkehrsverbund Schleswig-Holstein (NAH.SH)](http://www.nah.sh)
-HAFAS API.** It acts as a consistent and straightforward interface on
-top of a verbose API.
-
 
 ## Installing
 
