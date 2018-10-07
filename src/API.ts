@@ -1,33 +1,35 @@
+import "bootstrap";
+import "bootstrap-datepicker";
 import TableBuilder from 'table-builder'
+import * as client from "nahsh-hafas";
+import {Journey, SimpleJourney, simplifyJourney} from "./Interfaces.ts";
 
-import {Journey, SimpleJourney, simplifyJourney} from "./Interfaces";
+const headers = {
+    "origin": "Start",
+    "destination": "Ziel",
+    "stations": "Stationen",
+    "departure": "Abfahrt",
+    "arrival": "Ankunft",
+    "cancelOnRoute": "Ausfall"
+};
 
-'use strict'
+const kiToFl = (date: Date, resultCount: number): Promise<SimpleJourney[]> =>
+    client.journeys('8000103', '8000199', {results: resultCount, when: date})
+        .then((journeys: Journey[]) => journeys.map(journey => simplifyJourney(journey)))
+        .catch(console.error);
 
-const client = require('nahsh-hafas')
+const render = (journeys: SimpleJourney[]) =>
+    (new TableBuilder({'class': 'some-table'}))
+        .setHeaders(headers)
+        .setData(journeys)
+        .render();
 
-function kiToFl(date : Date, results : number) : Promise<SimpleJourney[]> {
+const date = new Date(2018, 8, 7, 8, 30, 0, 0);
+const resultCount = 2;
 
-    return client.journeys('8000103', '8000199', {results : results, when : date})
-	.then((journeys : Journey[]) => {
-	    return journeys.map(journey => simplifyJourney(journey));
-	})
-	.catch(console.error);
-}
+kiToFl(date, resultCount)
+    .then((journeys: SimpleJourney[]) => {
+        console.log(require('util').inspect(journeys, {depth: null}));
 
-console.log(new Date());
-var data = kiToFl(new Date(2018, 8, 7, 8, 30, 0, 0),2);
-data.then((journeys : SimpleJourney[]) => {
-    console.log(require('util').inspect(journeys, {depth: null}))
-    // You can put key-value pairs if you strongly want keep headers order:
-    var headers = { "origin" : "Start", "destination": "Ziel", "stations": "Stationen", "departure": "Abfahrt", "arrival": "Ankunft", "cancelOnRoute": "Ausfall" };
- 
-    var Table = require('table-builder');
-    var html = (new Table({'class': 'some-table'}))
-	.setHeaders(headers) // see above json headers section
-	.setData(journeys) // see above json data section
-	.render();
-    console.log(html);
-    this.htmlToAdd = html;
-});
- 
+        document.querySelector(".content").innerHTML = render(journeys);
+    });
